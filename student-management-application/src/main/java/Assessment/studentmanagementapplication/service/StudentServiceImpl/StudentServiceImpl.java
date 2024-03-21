@@ -3,7 +3,7 @@ package Assessment.studentmanagementapplication.service.StudentServiceImpl;
 import Assessment.studentmanagementapplication.dto.CreateStudentProfileDto;
 import Assessment.studentmanagementapplication.dto.StudentDto;
 import Assessment.studentmanagementapplication.entity.Student;
-import Assessment.studentmanagementapplication.exception.ExceptionHandling;
+import Assessment.studentmanagementapplication.exception.StudentExceptionNotFound;
 import Assessment.studentmanagementapplication.mapper.StudentMapper;
 import Assessment.studentmanagementapplication.repository.StudentRepository;
 import Assessment.studentmanagementapplication.service.StudentService;
@@ -32,12 +32,12 @@ public class StudentServiceImpl implements StudentService {
 
     private void inputValidating(CreateStudentProfileDto studentProfileDto) {
         if (studentProfileDto.getCurrentScore() <= 0 || studentProfileDto.getCurrentScore() >= 100) {
-            LOGGER.info("Current score doesnt not mee the requirements");
-            throw new ExceptionHandling("Current score must no be less than 0 or greater than 100");
+            LOGGER.info("Current score doesnt not meet the requirements");
+            throw new StudentExceptionNotFound("Current score must no be less than 0 or greater than 100");
         }
         if (StringUtils.isEmpty(studentProfileDto.getFirstName()) || StringUtils.isEmpty(studentProfileDto.getLastName())) {
             LOGGER.info("First name and Last name must be provided");
-            throw new ExceptionHandling("Need to provide both First name and Last name ");
+            throw new StudentExceptionNotFound("Need to provide both First name and Last name ");
         }
     }
 
@@ -45,7 +45,7 @@ public class StudentServiceImpl implements StudentService {
         String pattern = "^((\\+27)[6-8][0-9]{8})";
         if (!cellNumber.matches(pattern)) {
             LOGGER.info("Invalid cell number");
-            throw new ExceptionHandling("The cell number you provided is not valid");
+            throw new StudentExceptionNotFound("The cell number you provided is not valid");
         }
     }
 
@@ -56,14 +56,21 @@ public class StudentServiceImpl implements StudentService {
 
         if (!matcher.matches()) {
             LOGGER.info("Email provided is invalid");
-            throw new ExceptionHandling("Invalid email");
+            throw new StudentExceptionNotFound("Invalid email");
         }
 
         return matcher.matches();
     }
 
+    private void checkIfStudentExist(String studentNo) {
+        if (studentRepository.getStudent(studentNo) != null) {
+            throw new StudentExceptionNotFound("Student Already Exist");
+        }
+    }
+
     @Override
     public CreateStudentProfileDto createStudentProfile(CreateStudentProfileDto createStudentProfileDto) {
+        checkIfStudentExist(createStudentProfileDto.getFirstName() + createStudentProfileDto.getLastName());
         inputValidating(createStudentProfileDto);
         emailValidator(createStudentProfileDto.getEmailAddress());
         validateCellPhone(createStudentProfileDto.getCellPhoneNumber());
@@ -75,8 +82,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public StudentDto findStudentByStudentNumber(String studentNumber) {
-        Student student = studentRepository.findById(studentNumber)
-                .orElseThrow(() -> new ExceptionHandling("Student with student number : " + studentNumber + " does not exist"));
+        Student student = studentRepository.findById(studentNumber).orElseThrow(() -> new StudentExceptionNotFound("Student with student number : " + studentNumber + " does not exist"));
 
         StudentDto studentDto = StudentMapper.mapToStudentDto(student);
         studentDto.setCurrentScore(studentScoreService.getCurrentScore((student.getStudentNumber())));
@@ -141,7 +147,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public StudentDto updateStudentProfile(String studentNo, StudentDto studentDto) {
-        Student student = studentRepository.findById(studentNo).orElseThrow(() -> new ExceptionHandling("Student with student number : " + studentNo + " does not exist"));
+        Student student = studentRepository.findById(studentNo).orElseThrow(() -> new StudentExceptionNotFound("Student with student number : " + studentNo + " does not exist"));
         emailValidator(studentDto.getEmailAddress());
         validateCellPhone(studentDto.getCellPhoneNumber());
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -159,7 +165,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public void deleteStudentProfile(String studentNumber) {
-        Student student = studentRepository.findById(studentNumber).orElseThrow(() -> new ExceptionHandling("Student with student number : " + studentNumber + " does not exist"));
+        Student student = studentRepository.findById(studentNumber).orElseThrow(() -> new StudentExceptionNotFound("Student with student number : " + studentNumber + " does not exist"));
         studentRepository.deleteById(studentNumber);
     }
 }

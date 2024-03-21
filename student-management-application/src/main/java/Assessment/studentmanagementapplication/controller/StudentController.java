@@ -29,7 +29,6 @@ public class StudentController {
         String studentNo = createStudentProfileDto.getFirstName() + createStudentProfileDto.getLastName();
         studentScoreDto.setStudentNumber(studentNo);
         studentScoreDto.setScore(createStudentProfileDto.getCurrentScore());
-        studentScoreService.createStudentScore(studentScoreDto);
         CreateStudentProfileDto savedStudent = studentService.createStudentProfile(createStudentProfileDto);
         return new ResponseEntity<>(savedStudent, HttpStatus.CREATED);
     }
