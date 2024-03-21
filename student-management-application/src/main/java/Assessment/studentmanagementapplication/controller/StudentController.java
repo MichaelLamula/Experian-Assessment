@@ -25,11 +25,12 @@ public class StudentController {
 
     @PostMapping("/addStudent")
     public ResponseEntity<CreateStudentProfileDto> createStudentProfile(@RequestBody CreateStudentProfileDto createStudentProfileDto) {
+        CreateStudentProfileDto savedStudent = studentService.createStudentProfile(createStudentProfileDto);
         StudentScoreDto studentScoreDto = new StudentScoreDto();
         String studentNo = createStudentProfileDto.getFirstName() + createStudentProfileDto.getLastName();
         studentScoreDto.setStudentNumber(studentNo);
         studentScoreDto.setScore(createStudentProfileDto.getCurrentScore());
-        CreateStudentProfileDto savedStudent = studentService.createStudentProfile(createStudentProfileDto);
+        studentScoreService.createStudentScore(studentScoreDto);
         return new ResponseEntity<>(savedStudent, HttpStatus.CREATED);
     }
 

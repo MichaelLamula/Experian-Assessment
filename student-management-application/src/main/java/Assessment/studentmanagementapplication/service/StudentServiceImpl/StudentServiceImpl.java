@@ -30,7 +30,7 @@ public class StudentServiceImpl implements StudentService {
     @Autowired
     private StudentScoreServiceImpl studentScoreService;
 
-    private void inputValidating(CreateStudentProfileDto studentProfileDto) {
+    private void inputValidator(CreateStudentProfileDto studentProfileDto) {
         if (studentProfileDto.getCurrentScore() <= 0 || studentProfileDto.getCurrentScore() >= 100) {
             LOGGER.info("Current score doesnt not meet the requirements");
             throw new StudentExceptionNotFound("Current score must no be less than 0 or greater than 100");
@@ -41,7 +41,7 @@ public class StudentServiceImpl implements StudentService {
         }
     }
 
-    private void validateCellPhone(String cellNumber) {
+    private void cellNumberValidator(String cellNumber) {
         String pattern = "^((\\+27)[6-8][0-9]{8})";
         if (!cellNumber.matches(pattern)) {
             LOGGER.info("Invalid cell number");
@@ -71,9 +71,9 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public CreateStudentProfileDto createStudentProfile(CreateStudentProfileDto createStudentProfileDto) {
         checkIfStudentExist(createStudentProfileDto.getFirstName() + createStudentProfileDto.getLastName());
-        inputValidating(createStudentProfileDto);
+        inputValidator(createStudentProfileDto);
         emailValidator(createStudentProfileDto.getEmailAddress());
-        validateCellPhone(createStudentProfileDto.getCellPhoneNumber());
+        cellNumberValidator(createStudentProfileDto.getCellPhoneNumber());
         Student student = StudentMapper.mapToStudent(createStudentProfileDto);
         studentRepository.save(student);
         return StudentMapper.mapToCreateStudentProfileDto(student);
@@ -149,7 +149,7 @@ public class StudentServiceImpl implements StudentService {
     public StudentDto updateStudentProfile(String studentNo, StudentDto studentDto) {
         Student student = studentRepository.findById(studentNo).orElseThrow(() -> new StudentExceptionNotFound("Student with student number : " + studentNo + " does not exist"));
         emailValidator(studentDto.getEmailAddress());
-        validateCellPhone(studentDto.getCellPhoneNumber());
+        cellNumberValidator(studentDto.getCellPhoneNumber());
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         student.setFirstName(studentDto.getFirstName().toUpperCase());
