@@ -1,5 +1,6 @@
 package Assessment.studentmanagementapplication.controller;
 
+import Assessment.studentmanagementapplication.dto.CreateStudentProfileDto;
 import Assessment.studentmanagementapplication.dto.StudentDto;
 import Assessment.studentmanagementapplication.dto.StudentScoreDto;
 import Assessment.studentmanagementapplication.service.StudentScoreService;
@@ -23,8 +24,13 @@ public class StudentController {
     }
 
     @PostMapping("/addStudent")
-    public ResponseEntity<StudentDto> createStudentProfile(@RequestBody StudentDto studentDto) {
-        StudentDto savedStudent = studentService.createStudentProfile(studentDto);
+    public ResponseEntity<CreateStudentProfileDto> createStudentProfile(@RequestBody CreateStudentProfileDto createStudentProfileDto) {
+        StudentScoreDto studentScoreDto = new StudentScoreDto();
+        String studentNo = createStudentProfileDto.getFirstName() + createStudentProfileDto.getLastName();
+        studentScoreDto.setStudentNumber(studentNo);
+        studentScoreDto.setScore(createStudentProfileDto.getCurrentScore());
+        studentScoreService.createStudentScore(studentScoreDto);
+        CreateStudentProfileDto savedStudent = studentService.createStudentProfile(createStudentProfileDto);
         return new ResponseEntity<>(savedStudent, HttpStatus.CREATED);
     }
 

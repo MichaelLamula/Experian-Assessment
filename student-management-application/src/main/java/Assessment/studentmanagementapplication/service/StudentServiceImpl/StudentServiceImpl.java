@@ -1,5 +1,6 @@
 package Assessment.studentmanagementapplication.service.StudentServiceImpl;
 
+import Assessment.studentmanagementapplication.dto.CreateStudentProfileDto;
 import Assessment.studentmanagementapplication.dto.StudentDto;
 import Assessment.studentmanagementapplication.entity.Student;
 import Assessment.studentmanagementapplication.exception.ExceptionHandling;
@@ -29,26 +30,48 @@ public class StudentServiceImpl implements StudentService {
     @Autowired
     private StudentScoreServiceImpl studentScoreService;
 
-    private void inputValidating(StudentDto studentDto) {
-        if (studentDto.getCurrentScore() <= 0 || studentDto.getCurrentScore() >= 100) {
+    private void inputValidating(CreateStudentProfileDto studentProfileDto) {
+        if (studentProfileDto.getCurrentScore() <= 0 || studentProfileDto.getCurrentScore() >= 100) {
             LOGGER.info("Current score doesnt not mee the requirements");
             throw new ExceptionHandling("Current score must no be less than 0 or greater than 100");
         }
-        if (StringUtils.isEmpty(studentDto.getFirstName()) || StringUtils.isEmpty(studentDto.getLastName())) {
+        if (StringUtils.isEmpty(studentProfileDto.getFirstName()) || StringUtils.isEmpty(studentProfileDto.getLastName())) {
             LOGGER.info("First name and Last name must be provided");
             throw new ExceptionHandling("Need to provide both First name and Last name ");
         }
     }
 
-    @Override
-    public StudentDto createStudentProfile(StudentDto studentDto) {
-        inputValidating(studentDto);
-        emailValidator(studentDto.getEmailAddress());
-        studentScoreService.addScore(studentDto);
-        Student student = StudentMapper.mapToStudent(studentDto);
-        studentRepository.save(student);
-        return StudentMapper.mapToStudentDto(student);
+    private void validateCellPhone(String cellNumber) {
+        String pattern = "^((\\+27)[6-8][0-9]{8})";
+        if (!cellNumber.matches(pattern)) {
+            LOGGER.info("Invalid cell number");
+            throw new ExceptionHandling("The cell number you provided is not valid");
+        }
     }
+
+    private boolean emailValidator(String email) {
+        final String EMAIL_REGEX = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        final Pattern pattern = Pattern.compile(EMAIL_REGEX);
+        Matcher matcher = pattern.matcher(email);
+
+        if (!matcher.matches()) {
+            LOGGER.info("Email provided is invalid");
+            throw new ExceptionHandling("Invalid email");
+        }
+
+        return matcher.matches();
+    }
+
+    @Override
+    public CreateStudentProfileDto createStudentProfile(CreateStudentProfileDto createStudentProfileDto) {
+        inputValidating(createStudentProfileDto);
+        emailValidator(createStudentProfileDto.getEmailAddress());
+        validateCellPhone(createStudentProfileDto.getCellPhoneNumber());
+        Student student = StudentMapper.mapToStudent(createStudentProfileDto);
+        studentRepository.save(student);
+        return StudentMapper.mapToCreateStudentProfileDto(student);
+    }
+
 
     @Override
     public StudentDto findStudentByStudentNumber(String studentNumber) {
@@ -59,7 +82,7 @@ public class StudentServiceImpl implements StudentService {
         studentDto.setCurrentScore(studentScoreService.getCurrentScore((student.getStudentNumber())));
         studentDto.setAverageScore(studentScoreService.getAverageScore(student.getStudentNumber()));
 
-        return StudentMapper.mapToStudentDto(student);
+        return studentDto;
     }
 
     @Override
@@ -91,19 +114,6 @@ public class StudentServiceImpl implements StudentService {
         return studentDtoList;
     }
 
-    private boolean emailValidator(String email) {
-        final String EMAIL_REGEX = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-        final Pattern pattern = Pattern.compile(EMAIL_REGEX);
-        Matcher matcher = pattern.matcher(email);
-
-        if (!matcher.matches()) {
-            LOGGER.info("Email provided is invalid");
-            throw new ExceptionHandling("Invalid email");
-        }
-
-        return matcher.matches();
-    }
-
     @Override
     public StudentDto findStudentByEmail(String email) {
         emailValidator(email);
@@ -133,7 +143,7 @@ public class StudentServiceImpl implements StudentService {
     public StudentDto updateStudentProfile(String studentNo, StudentDto studentDto) {
         Student student = studentRepository.findById(studentNo).orElseThrow(() -> new ExceptionHandling("Student with student number : " + studentNo + " does not exist"));
         emailValidator(studentDto.getEmailAddress());
-
+        validateCellPhone(studentDto.getCellPhoneNumber());
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         student.setFirstName(studentDto.getFirstName().toUpperCase());

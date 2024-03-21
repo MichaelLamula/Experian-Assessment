@@ -1,5 +1,6 @@
 package Assessment.studentmanagementapplication.service;
 
+import Assessment.studentmanagementapplication.dto.CreateStudentProfileDto;
 import Assessment.studentmanagementapplication.dto.StudentDto;
 import org.springframework.stereotype.Service;
 
@@ -7,7 +8,7 @@ import java.util.List;
 
 @Service
 public interface StudentService {
-    StudentDto createStudentProfile(StudentDto studentDto);
+    CreateStudentProfileDto createStudentProfile(CreateStudentProfileDto createStudentProfileDto);
 
     StudentDto findStudentByStudentNumber(String studentNumber);
 

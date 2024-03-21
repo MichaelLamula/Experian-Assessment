@@ -1,5 +1,6 @@
 package Assessment.studentmanagementapplication.mapper;
 
+import Assessment.studentmanagementapplication.dto.CreateStudentProfileDto;
 import Assessment.studentmanagementapplication.dto.StudentDto;
 import Assessment.studentmanagementapplication.entity.Student;
 
@@ -26,13 +27,29 @@ public class StudentMapper {
                 student.getCurrentScore());
     }
 
-    public static Student mapToStudent(StudentDto studentDto) {
+    public static CreateStudentProfileDto mapToCreateStudentProfileDto(Student student) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        Date dateOfBirth = null;
+        try {
+            dateOfBirth = dateFormat.parse(student.getDateOfBirth());
+        } catch (ParseException e) {
+            e.getStackTrace();
+        }
+
+        return new CreateStudentProfileDto(student.getFirstName(),
+                student.getLastName(), dateOfBirth,
+                student.getCellPhoneNumber(), student.getEmailAddress(),
+                student.getCurrentScore());
+    }
+
+    public static Student mapToStudent(CreateStudentProfileDto student) {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        return new Student(studentDto.getFirstName(),
-                studentDto.getLastName(), dateFormat.format(studentDto.getDateOfBirth()),
-                studentDto.getCellPhoneNumber(), studentDto.getEmailAddress(),
-                studentDto.getCurrentScore(), studentDto.getAverageScore());
+        return new Student(student.getFirstName(),
+                student.getLastName(), dateFormat.format(student.getDateOfBirth()),
+                student.getCellPhoneNumber(), student.getEmailAddress(),
+                student.getCurrentScore(), 1);
     }
 
 }

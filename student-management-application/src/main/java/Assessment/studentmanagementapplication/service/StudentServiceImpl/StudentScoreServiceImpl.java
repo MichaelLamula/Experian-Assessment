@@ -1,5 +1,6 @@
 package Assessment.studentmanagementapplication.service.StudentServiceImpl;
 
+import Assessment.studentmanagementapplication.dto.CreateStudentProfileDto;
 import Assessment.studentmanagementapplication.dto.StudentDto;
 import Assessment.studentmanagementapplication.dto.StudentScoreDto;;
 import Assessment.studentmanagementapplication.entity.StudentScores;
@@ -62,8 +63,10 @@ public class StudentScoreServiceImpl implements StudentScoreService {
         return studentScoreRepository.getStudentScoresByStudentNumber(studentNo);
     }
 
-    public void addScore(StudentDto student) {
+    public void addScore(CreateStudentProfileDto student) {
         StudentScoreDto studentScoreDto = new StudentScoreDto();
+        String studentNo = student.getFirstName() + student.getLastName();
+        studentScoreDto.setStudentNumber(studentNo);
         studentScoreDto.setScore(student.getCurrentScore());
         StudentScores addedScore = StudentScoreMapper.mapToStudentScore(studentScoreDto);
         studentScoreRepository.save(addedScore);

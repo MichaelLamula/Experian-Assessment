@@ -29,7 +29,7 @@ public class Student {
     @Column(name = "cell_phone_number")
     private String cellPhoneNumber;
 
-    @Column(name = "email_address",unique = true)
+    @Column(name = "email_address", unique = true)
     private String emailAddress;
 
     @Column(name = "current_score")
@@ -40,7 +40,7 @@ public class Student {
 
 
     public Student(String firstName, String lastName, String dateOfBirth, String cellPhoneNumber, String emailAddress, int currentScore, int averageScore) {
-        this.studentNumber = generateStudentNumber(firstName,lastName);
+        this.studentNumber = generateStudentNumber(firstName, lastName);
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
@@ -50,7 +50,7 @@ public class Student {
         this.averageScore = averageScore;
     }
 
-    private String generateStudentNumber(String firstName,String lastName){
-        return firstName+lastName;
+    private String generateStudentNumber(String firstName, String lastName) {
+        return firstName + lastName;
     }
 }
