@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+
 @Repository
 public interface StudentScoreRepository extends JpaRepository<StudentScores, Long> {
     @Query("SELECT sc FROM StudentScores sc WHERE sc.studentNumber = :studentNo")
