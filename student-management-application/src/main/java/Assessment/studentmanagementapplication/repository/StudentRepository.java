@@ -18,4 +18,7 @@ public interface StudentRepository extends JpaRepository<Student, String> {
 
     @Query("SELECT sp FROM Students sp WHERE sp.emailAddress = :lastName")
     Student getStudentsByEmailAddress(String lastName);
+
+    @Query("SELECT sp FROM Students sp WHERE sp.studentNumber = :studentNo")
+    Student getStudent(String studentNo);
 }

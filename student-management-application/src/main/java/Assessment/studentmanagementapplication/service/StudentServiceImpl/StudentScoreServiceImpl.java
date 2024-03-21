@@ -1,10 +1,9 @@
 package Assessment.studentmanagementapplication.service.StudentServiceImpl;
 
 import Assessment.studentmanagementapplication.dto.CreateStudentProfileDto;
-import Assessment.studentmanagementapplication.dto.StudentDto;
 import Assessment.studentmanagementapplication.dto.StudentScoreDto;;
 import Assessment.studentmanagementapplication.entity.StudentScores;
-import Assessment.studentmanagementapplication.exception.ExceptionHandling;
+import Assessment.studentmanagementapplication.exception.StudentExceptionNotFound;
 import Assessment.studentmanagementapplication.mapper.StudentScoreMapper;
 import Assessment.studentmanagementapplication.repository.StudentScoreRepository;
 import Assessment.studentmanagementapplication.service.StudentScoreService;
@@ -53,7 +52,7 @@ public class StudentScoreServiceImpl implements StudentScoreService {
             }
         } catch (ArithmeticException exception) {
             LOGGER.info("Any number divide by zero is undefined");
-            throw new ExceptionHandling("Any number divide by zero is undefined");
+            throw new StudentExceptionNotFound("Any number divide by zero is undefined");
         }
         return (int) average;
     }
@@ -75,7 +74,7 @@ public class StudentScoreServiceImpl implements StudentScoreService {
     private void scoreValidation(int score) {
         if (score <= 0 || score > 100) {
             LOGGER.info("score doesnt meat the requirements");
-            throw new ExceptionHandling("Score must be more than 0 and not more than 100");
+            throw new StudentExceptionNotFound("Score must be more than 0 and not more than 100");
         }
     }
 }
