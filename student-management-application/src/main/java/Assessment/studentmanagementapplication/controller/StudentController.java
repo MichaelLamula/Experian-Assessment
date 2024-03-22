@@ -3,6 +3,7 @@ package Assessment.studentmanagementapplication.controller;
 import Assessment.studentmanagementapplication.dto.CreateStudentProfileDto;
 import Assessment.studentmanagementapplication.dto.StudentDto;
 import Assessment.studentmanagementapplication.dto.StudentScoreDto;
+import Assessment.studentmanagementapplication.exception.StudentExceptionNotFound;
 import Assessment.studentmanagementapplication.service.StudentScoreService;
 import Assessment.studentmanagementapplication.service.StudentService;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/students")
+@CrossOrigin("")
 public class StudentController {
     private StudentService studentService;
     private StudentScoreService studentScoreService;
@@ -36,7 +38,10 @@ public class StudentController {
 
     @PostMapping("/addingScore")
     public ResponseEntity<StudentScoreDto> addStudentScore(@RequestBody StudentScoreDto studentScoreDto) {
-        StudentScoreDto addedScore = studentScoreService.createStudentScore(studentScoreDto);
+        StudentScoreDto addedScore = null;
+        if(studentService.findStudentByStudentNumber(studentScoreDto.getStudentNumber()) != null){
+            addedScore = studentScoreService.createStudentScore(studentScoreDto);
+        }
         return new ResponseEntity<>(addedScore, HttpStatus.CREATED);
     }
 
@@ -80,6 +85,7 @@ public class StudentController {
     @DeleteMapping("/delete/{studentNumber}")
     public ResponseEntity<String> deleteStudentProfile(@PathVariable("studentNumber") String studentNo) {
         studentService.deleteStudentProfile(studentNo);
+        studentScoreService.deleteAllScores(studentNo);
         return ResponseEntity.ok("Student profile deleted successfully");
     }
 }

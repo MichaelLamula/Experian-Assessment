@@ -68,11 +68,18 @@ public class StudentServiceImpl implements StudentService {
         }
     }
 
+    private void checkIfEmailIsTaken(String email){
+        if(studentRepository.getStudentsByEmailAddress(email) != null){
+            throw new StudentExceptionNotFound("Email already taken try another one");
+        }
+    }
+
     @Override
     public CreateStudentProfileDto createStudentProfile(CreateStudentProfileDto createStudentProfileDto) {
         checkIfStudentExist(createStudentProfileDto.getFirstName() + createStudentProfileDto.getLastName());
         inputValidator(createStudentProfileDto);
         emailValidator(createStudentProfileDto.getEmailAddress());
+        checkIfEmailIsTaken(createStudentProfileDto.getEmailAddress());
         cellNumberValidator(createStudentProfileDto.getCellPhoneNumber());
         Student student = StudentMapper.mapToStudent(createStudentProfileDto);
         studentRepository.save(student);
@@ -148,8 +155,6 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public StudentDto updateStudentProfile(String studentNo, StudentDto studentDto) {
         Student student = studentRepository.findById(studentNo).orElseThrow(() -> new StudentExceptionNotFound("Student with student number : " + studentNo + " does not exist"));
-        emailValidator(studentDto.getEmailAddress());
-        cellNumberValidator(studentDto.getCellPhoneNumber());
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         if (StringUtils.isEmpty(studentDto.getFirstName())) {
@@ -161,7 +166,7 @@ public class StudentServiceImpl implements StudentService {
         if (StringUtils.isEmpty(studentDto.getLastName())) {
             student.setLastName(student.getLastName());
         } else {
-            student.setLastName(studentDto.getLastName().toUpperCase());
+            student.setLastName(studentDto.getLastName());
         }
 
         if (studentDto.getDateOfBirth() == null) {
@@ -173,12 +178,14 @@ public class StudentServiceImpl implements StudentService {
         if (StringUtils.isEmpty(studentDto.getCellPhoneNumber())) {
             student.setCellPhoneNumber(student.getCellPhoneNumber());
         } else {
+            cellNumberValidator(studentDto.getCellPhoneNumber());
             student.setCellPhoneNumber(studentDto.getCellPhoneNumber());
         }
 
         if (StringUtils.isEmpty(studentDto.getEmailAddress())) {
             student.setEmailAddress(student.getEmailAddress());
         } else {
+            emailValidator(studentDto.getEmailAddress());
             student.setEmailAddress(studentDto.getEmailAddress());
         }
 

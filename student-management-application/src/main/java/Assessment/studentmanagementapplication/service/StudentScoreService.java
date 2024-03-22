@@ -11,5 +11,6 @@ public interface StudentScoreService {
     StudentScoreDto createStudentScore(StudentScoreDto studentScoreDto);
     long getCount(String studentNo);
     List<StudentScores> getAllStudentScoresByStudentNumber(String studentNo);
+    void deleteAllScores(String studentNo);
 
 }
