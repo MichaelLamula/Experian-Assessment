@@ -152,11 +152,35 @@ public class StudentServiceImpl implements StudentService {
         cellNumberValidator(studentDto.getCellPhoneNumber());
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-        student.setFirstName(studentDto.getFirstName().toUpperCase());
-        student.setLastName(studentDto.getLastName().toUpperCase());
-        student.setCellPhoneNumber(studentDto.getCellPhoneNumber());
-        student.setDateOfBirth(dateFormat.format(studentDto.getDateOfBirth()));
-        student.setEmailAddress(studentDto.getEmailAddress());
+        if (StringUtils.isEmpty(studentDto.getFirstName())) {
+            student.setFirstName(student.getFirstName());
+        } else {
+            student.setFirstName(studentDto.getFirstName());
+        }
+
+        if (StringUtils.isEmpty(studentDto.getLastName())) {
+            student.setLastName(student.getLastName());
+        } else {
+            student.setLastName(studentDto.getLastName().toUpperCase());
+        }
+
+        if (studentDto.getDateOfBirth() == null) {
+            student.setDateOfBirth(student.getDateOfBirth());
+        } else {
+            student.setDateOfBirth(dateFormat.format(studentDto.getDateOfBirth()));
+        }
+
+        if (StringUtils.isEmpty(studentDto.getCellPhoneNumber())) {
+            student.setCellPhoneNumber(student.getCellPhoneNumber());
+        } else {
+            student.setCellPhoneNumber(studentDto.getCellPhoneNumber());
+        }
+
+        if (StringUtils.isEmpty(studentDto.getEmailAddress())) {
+            student.setEmailAddress(student.getEmailAddress());
+        } else {
+            student.setEmailAddress(studentDto.getEmailAddress());
+        }
 
         Student updatedStudent = studentRepository.save(student);
 
