@@ -71,6 +71,13 @@ public class StudentScoreServiceImpl implements StudentScoreService {
         studentScoreRepository.save(addedScore);
     }
 
+    public void deleteAllScores(String studentNo){
+        List<StudentScores> students  = studentScoreRepository.getStudentScoresByStudentNumber(studentNo);
+        for (StudentScores student:students) {
+            studentScoreRepository.delete(student);
+        }
+    }
+
     private void scoreValidation(int score) {
         if (score <= 0 || score > 100) {
             LOGGER.info("score doesnt meat the requirements");
